@@ -1,4 +1,4 @@
-import Observable from "../util/observable.js";
+import Observable from "../../util/observable.js";
 
 export default class VendingMachineModel extends Observable {
   constructor(requestUrl, httpRequestModule) {
@@ -7,8 +7,8 @@ export default class VendingMachineModel extends Observable {
     this.http = httpRequestModule;
     this.menu = null;
     this.inputMoney = null;
-    this.selectedMenu = [];
   }
+
   getInitialData() {
     return new Promise(res => {
       res(
@@ -20,19 +20,25 @@ export default class VendingMachineModel extends Observable {
       );
     });
   }
-  updateWhenInputMoney(price) {
-    this.inputMoney += parseInt(price);
-    this.notify("inputMoney", this.inputMoney);
+
+  updateWhenInputMoney(inputMoney) {
+    this.notify("inputMoney", inputMoney);
   }
-  matchingMenu(price) {
-    this.menu.forEach(menu => {
-      if (menu.price <= price) return this.selectedMenu.push(menu);
-    });
-    this.notify("inputMoney", this.selectedMenu);
+
+  updateInputMoneyMsg(inputMoney){
+    this.notify("inputMoneyMsg", inputMoney);
   }
-  setSelectedItem(menuId) {
-    let selectedItem = this.menu.find(menu => menu.id == menuId);
-    this.inputMoney -= selectedItem.price;
+
+  setSelectedItem(selectedItem) {
     this.notify("purchaseItem", selectedItem);
+  }
+
+  throwError(errorMessage) {
+    this.notify("throwError", errorMessage);
+  }
+
+  init(){
+    const init = '초기화';
+    this.notify("completed", init);
   }
 }

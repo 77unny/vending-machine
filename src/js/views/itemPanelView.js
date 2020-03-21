@@ -1,4 +1,4 @@
-import { selectorNames } from "../util/constant.js";
+import { selectorNames } from "../../util/constant.js";
 import { itemPanel } from "./template.js";
 
 export default class ItemPanelView {
@@ -10,13 +10,13 @@ export default class ItemPanelView {
   }
 
   registerAsObserver() {
-    // 각각의 모델에 ItemPanelView를 observer로 등록
     this.vendingMachineModel.addObserver("loadData", this.render.bind(this));
     this.vendingMachineModel.addObserver(
       "inputMoney",
       this.updateItemPanelView.bind(this)
     );
     this.vendingMachineModel.addObserver("purchaseItem", this.updateItemPanelView.bind(this));
+    this.vendingMachineModel.addObserver("completed", this.init.bind(this));
   }
 
   render(data) {
@@ -27,7 +27,7 @@ export default class ItemPanelView {
   }
 
   updateItemPanelView(data) {
-    this.statusMoney = data;
+    typeof data === "object" ? this.statusMoney -= data.price : this.statusMoney = data;
     const itemList = document.querySelectorAll(".item-list li");
     const itemListArray = Array.from(itemList);
     const filterItems = this.menu.filter(v => v.price <= this.statusMoney);
@@ -35,5 +35,11 @@ export default class ItemPanelView {
     filterItems.forEach(element => {
       itemListArray[element.id - 1].classList.add("active");
     });
+  }
+
+  init(){
+    const itemList = document.querySelectorAll(".item-list li");
+    const itemListArray = Array.from(itemList);
+    itemListArray.forEach(v => v.classList.remove("active"));
   }
 }
